@@ -6,6 +6,9 @@ This document records the workspace, configuration, and run IDs the workshop was
 
 | Field | Value |
 |---|---|
+| Date | 2026-05-30 |
+| Run ID | 1013199850453523 |
+| Result | TERMINATED / SUCCESS across all 8 task chain steps |
 | Workspace | `e2-demo-west.cloud.databricks.com` |
 | Compute | Serverless notebooks, client image v4 |
 | MLflow version | 3.12.0 |
