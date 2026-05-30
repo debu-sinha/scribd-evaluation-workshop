@@ -15,7 +15,7 @@
 # MAGIC
 # MAGIC The end-user thumbs is volume signal - cheap, dirty, biased toward the kinds of failures
 # MAGIC users actually feel. The Review App label is expert signal - typed, slow, and the closest
-# MAGIC thing to ground truth we have. Judges are trained against the expert signal in notebook 03.
+# MAGIC thing to ground truth we have. Notebook 03 uses the expert labels to calibrate the judge.
 
 # COMMAND ----------
 
@@ -230,7 +230,7 @@ print(f"Labeling session URL: {session.url}")
 # MAGIC **Assessments** panel - open the experiment, click any trace from notebook 01, and the
 # MAGIC `end_user_rating: true/false` entry from `end_user@example.com` is right there alongside the
 # MAGIC labels SMEs post here. Both write into the same trace's assessment list. The Review App is
-# MAGIC just one of several human-signal capture channels.
+# MAGIC just one of several ways to capture human signal.
 
 # COMMAND ----------
 

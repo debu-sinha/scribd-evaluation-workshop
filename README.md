@@ -2,7 +2,7 @@
 
 End-to-end evaluation workshop for production GenAI agents on Databricks. Covers tracing, scorers, LLM judges, judge alignment against SME labels, scheduled production monitoring, OTel Traces in Unity Catalog, deployed agents with AI Playground routing, custom annotation apps for PDF-grounded review, and versioned judges via the Prompt Registry.
 
-Eight runnable notebooks plus a configuration notebook. All notebooks run on Serverless. There's no cluster setup, no DAB deploy, no extra packages. Just import the folder into your workspace and run notebook by notebook in order.
+Eight runnable notebooks plus a configuration notebook. All cells run on Serverless. No cluster setup, no DAB deploy, no extra packages. Clone this repo into your workspace and run them in order.
 
 ---
 
@@ -29,11 +29,11 @@ If you want the production deployment pattern only:
 
 ![Problem](./notebooks/images/hd_problem.png)
 
-Most teams already have an ad hoc eval setup that's been good enough. It works at a few hundred traces, then it starts breaking somewhere on the way to production scale.
+Most teams already have an ad hoc eval setup. It works at a few hundred traces. Then it breaks at production scale.
 
 ## The three pillars
 
-Three principles tie every notebook together. Each capability you build maps back to one of them.
+Three principles tie every notebook together.
 
 ![Three pillars](./notebooks/images/hd_three_pillars.png)
 
@@ -59,7 +59,7 @@ User question -> traced agent -> trace in UC -> SME labels in Review App + LLM j
 | 07 | `07_custom_annotation_app` | Skeleton for a custom Databricks App that renders source PDFs and parsed markdown side by side for SME review, writes feedback back via `log_feedback`. | runs end to end |
 | 99 | `99_register_judge_prompt_versions` | Push baseline and aligned judge prompts to the UC Prompt Registry with commit messages and tags. Diff view, version pinning by alias, production load pattern. | runs end to end |
 
-We've numbered it 99 on purpose. It's optional and isn't part of the linear narrative.
+99 is optional. We numbered it that way to keep it out of the main flow.
 
 ---
 
@@ -80,17 +80,31 @@ If you skip the optional items, notebooks 05 and 06 still run but some cells sta
 
 ## How to run
 
-Pick one of two paths.
+Three paths. Pick whichever fits how your team usually pulls code into the workspace. All three were tested against the verification workspace listed in `docs/verification.md`.
 
-**Path A: GUI import (fastest start, no CLI needed)**
+**Path 1: Databricks Repos (recommended, no CLI, no download)**
 
-1. Download this repo as a ZIP from GitHub.
-2. In your Databricks workspace: top-right menu -> Import -> File -> upload the ZIP.
-3. Open `notebooks/00_introduction`. Run the cells.
-4. Open `notebooks/01_agent_app`. Run all cells.
-5. Continue through the rest in order.
+In the workspace sidebar, click **Workspace** → **Repos** → **Add Repo**. Paste:
 
-**Path B: Workspace clone via CLI**
+```
+https://github.com/debu-sinha/scribd-evaluation-workshop
+```
+
+Pick `main` as the branch. The folder lands under `/Workspace/Repos/<your-user>/scribd-evaluation-workshop/`. Open `notebooks/00_introduction` from there and run them in order.
+
+This is the path the verification job runs against. If your workspace has git provider integration set up, this is also the path that lets you `Pull` updates later.
+
+**Path 2: ZIP import via GUI**
+
+Use this if your workspace doesn't have GitHub configured under Settings → Linked accounts.
+
+1. On GitHub, click **Code** → **Download ZIP**.
+2. In your Databricks workspace, right-click your user folder → **Import** → **File** → upload the ZIP.
+3. Open `notebooks/00_introduction` from the imported folder and run them in order.
+
+**Path 3: CLI import-dir**
+
+For CI workflows or workspace setup scripts.
 
 ```bash
 git clone https://github.com/debu-sinha/scribd-evaluation-workshop.git
@@ -100,13 +114,13 @@ databricks workspace import-dir \
   --profile <your-profile>
 ```
 
-Then open `/Workspace/Users/$USER/genai-evaluation-workshop/00_introduction` in the workspace.
+Open `/Workspace/Users/$USER/genai-evaluation-workshop/00_introduction` in the workspace.
 
 ---
 
 ## What each notebook produces
 
-Every resource the notebooks create is per-user-scoped, so multiple engineers on the same team can run the workshop in the same workspace without colliding. After running the full sequence, your workspace contains:
+Every resource the notebooks create is namespaced by user. Two engineers on the same team can run this in the same workspace without stepping on each other. After running the full sequence, your workspace has:
 
 - One MLflow experiment at `/Workspace/Users/<you>/genai_evals_demo/agent_traces` with about 25 traces from notebook 01
 - A Review App labeling session with typed schemas for groundedness, relevance, rationale
@@ -144,7 +158,7 @@ If your current setup is LangSmith for tracing and a Delta table for batch eval 
 | Annotation queues | Review App labeling sessions + custom Databricks App (notebook 07) for PDF-grounded review |
 | Prompt Hub | UC Prompt Registry (notebook 99) with versioned prompts, commit messages, tags, alias-based pinning |
 
-The biggest behavioral difference is that every trace and every assessment lives in Unity Catalog. SQL, Genie, AI/BI dashboards, and Lakehouse Federation all see the same data the MLflow UI shows. It's one catalog underneath.
+The big difference is that traces and assessments are Delta tables in Unity Catalog. SQL warehouses, Genie, AI/BI dashboards, and Lakehouse Federation all read the same data the MLflow UI shows.
 
 ---
 
@@ -165,7 +179,7 @@ results = mlflow.genai.evaluate(
 )
 ```
 
-Notebook 03 walks through this exact pattern. The eval surface doesn't care whether outputs came from a live agent or a pre-computed Delta table.
+Notebook 03 walks through this exact pattern. `mlflow.genai.evaluate` doesn't care whether outputs came from a live agent or a pre-computed Delta table.
 
 ---
 
@@ -188,7 +202,7 @@ All diagrams are Excalidraw source plus rendered PNG, both committed under `note
 
 ## Verification
 
-This workshop was tested end-to-end on Databricks Serverless. The verification run is documented in `docs/verification.md`. If a notebook fails on you, the most common causes are:
+Tested end to end on Databricks Serverless against the workspace listed in `docs/verification.md`. If a notebook fails for you, the usual causes are:
 
 1. **Foundation Model API rate limit** on shared workspaces. Notebook 03 catches `REQUEST_LIMIT_EXCEEDED` and falls back to the unaligned judge.
 2. **Missing UC privileges** for the Prompt Registry in notebook 99. The notebook auto-detects a UC schema you own. If you don't own any schema, set `PROMPT_SCHEMA` explicitly or have a metastore admin grant `CREATE FUNCTION` on a schema to your user.
@@ -204,6 +218,6 @@ MIT. See `LICENSE`.
 
 ## Authors
 
-Built by [Debu Sinha](https://github.com/debu-sinha) as part of the Databricks Field Engineering MLflow GenAI evaluation track. A customer collaboration with Scribd surfaced the PDF-annotation app and judge-versioning patterns covered in notebooks 07 and 99.
+Built by [Debu Sinha](https://github.com/debu-sinha) as part of the Databricks Field Engineering MLflow GenAI evaluation track. The PDF-annotation app and judge-versioning patterns in notebooks 07 and 99 came out of work with the Scribd team.
 
 Questions or suggestions? Open an issue on this repo or reach out via Slack.

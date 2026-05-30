@@ -46,9 +46,9 @@
 # MAGIC Anthropic SDK, LlamaIndex, DSPy, or any of the 40-odd frameworks MLflow ships native
 # MAGIC integrations for, you do not need to hand-decorate every function. A single
 # MAGIC `mlflow.langchain.autolog()` (or the equivalent for your stack) auto-instruments the
-# MAGIC framework and emits the same trace shape. We use explicit `@mlflow.trace` here for
-# MAGIC pedagogical clarity, but production code typically combines the two: auto-log the
-# MAGIC framework + decorate the custom orchestration glue between framework calls.
+# MAGIC framework and emits the same trace shape. We use explicit `@mlflow.trace` here because
+# MAGIC it's easier to follow. In production you usually combine the two: auto-log the framework
+# MAGIC and decorate the custom glue between framework calls.
 
 # COMMAND ----------
 

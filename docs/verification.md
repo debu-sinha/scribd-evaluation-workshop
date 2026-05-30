@@ -27,7 +27,9 @@ The chain is:
 nb01 -> nb02 -> nb03 -> nb04 -> nb05 -> nb06 -> nb07 -> nb99
 ```
 
-A failure anywhere in the chain blocks what's downstream via `UPSTREAM_FAILED`, so green at the end means it's green at every step.
+The Databricks Repos clone path (the recommended onboarding path in the README) was also validated separately. The repo was cloned into `/Workspace/Users/<user>/_scribd_workshop_repos_test/` via the Repos API, then `notebooks/01_agent_app` was submitted from the cloned location. Run ID 185734097551132, TERMINATED/SUCCESS. This confirms the workspace-side import works end to end, not just the local-to-workspace upload path the original chain used.
+
+If anything in the chain fails, everything after it gets marked `UPSTREAM_FAILED`. Green at the end means every step was green.
 
 ## How to reproduce
 
