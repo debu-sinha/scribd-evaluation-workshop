@@ -29,6 +29,17 @@ nb01 -> nb02 -> nb03 -> nb04 -> nb05 -> nb06 -> nb07 -> nb99
 
 The Databricks Repos clone path (the recommended onboarding path in the README) was also validated separately. The repo was cloned into `/Workspace/Users/<user>/_scribd_workshop_repos_test/` via the Repos API, then `notebooks/01_agent_app` was submitted from the cloned location. Run ID 185734097551132, TERMINATED/SUCCESS. This confirms the workspace-side import works end to end, not just the local-to-workspace upload path the original chain used.
 
+## PDF-grounded review flow (nb07 end to end)
+
+The nb07 custom annotation app pattern was validated end to end on May 30 2026. Run ID 1024881076868832, TERMINATED/SUCCESS. The flow:
+
+1. Step 1 runs three `parse_document` traces. Each one attaches `source_pdf_uri` as trace metadata via `mlflow.update_current_trace(metadata=...)` and returns parsed markdown.
+2. Step 2 calls `MlflowClient.search_traces(filter_string="trace.name = 'parse_document'")` and finds the traces.
+3. Step 3 reads `source_pdf_uri` from the trace's `request_metadata` and the parsed markdown from `trace.data.response`, then renders a side-by-side PDF iframe and markdown panel via `displayHTML`.
+4. Step 4 writes two annotations back to the same trace via `mlflow.log_feedback` (`markdown_matches_pdf`, `source_attribution_correct`).
+
+The notebook does not require a UC Volume to be configured. The demo uses a public W3C sample PDF so the iframe renders without workspace-specific setup. The same code works against UC Volume paths (`/Volumes/<catalog>/<schema>/<vol>/<file>.pdf`) by changing the `SAMPLE_PDF_URL` constant.
+
 If anything in the chain fails, everything after it gets marked `UPSTREAM_FAILED`. Green at the end means every step was green.
 
 ## How to reproduce

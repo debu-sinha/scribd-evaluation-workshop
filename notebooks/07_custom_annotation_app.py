@@ -6,11 +6,12 @@
 # MAGIC annotators need to see the original PDF while validating the parsed markdown or downstream
 # MAGIC LLM output, the production answer is a custom Databricks App built on the Review App API.
 # MAGIC
-# MAGIC This notebook is the working skeleton of that App. Three pieces:
+# MAGIC This notebook is the working skeleton of that App. Four pieces:
 # MAGIC
-# MAGIC 1. Pull a trace plus the attached source PDF from the experiment.
-# MAGIC 2. Render the PDF and the parsed markdown side by side for the annotator.
-# MAGIC 3. Write the annotator's feedback back to the trace via `mlflow.log_feedback`.
+# MAGIC 1. Run a small parsing-agent stand-in that attaches a source PDF URI to its trace.
+# MAGIC 2. Pull that trace and read the PDF URI plus the parsed markdown from it.
+# MAGIC 3. Render the PDF and the parsed markdown side by side for the annotator.
+# MAGIC 4. Write the annotator's feedback back to the trace via `mlflow.log_feedback`.
 # MAGIC
 # MAGIC ![Custom annotation app concept](./images/hd_custom_annotation_app_concept.png)
 # MAGIC
@@ -40,15 +41,17 @@
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC ## Step 1. Pull traces with source PDF references
+# MAGIC ## Step 1. Upstream - a parsing-agent stand-in that attaches the source PDF
 # MAGIC
-# MAGIC `mlflow.search_traces` returns recent traces from the experiment. In a real annotator app
-# MAGIC this would filter for traces that are missing assessments from the current annotator.
+# MAGIC In a real pipeline this would be the document-parsing stage (Mistral OCR, Azure Document
+# MAGIC Intelligence, or `ai_extract` over a Delta table of source files). For the demo it is a
+# MAGIC `@mlflow.trace`-decorated function that records the source PDF URI as trace metadata and
+# MAGIC returns the parsed markdown. The trace is what the annotation app downstream reads from.
 
 # COMMAND ----------
 
 import mlflow
-from mlflow.entities import AssessmentSource, AssessmentSourceType
+from mlflow.entities import AssessmentSource, AssessmentSourceType, SpanType
 
 # Resolve the current Databricks workspace user the same way notebooks 01-06 do.
 # In production the custom app reads annotator identity from its OAuth context,
@@ -66,35 +69,91 @@ from databricks.sdk import WorkspaceClient
 WorkspaceClient().workspace.mkdirs(EXPERIMENT_PARENT)
 mlflow.set_experiment(EXPERIMENT_PATH)
 
-# Pull recent traces. The skeleton uses what notebook 01 produced;
-# the production app would scope to the parse-pipeline run name.
-traces_df = mlflow.search_traces(max_results=5)
-print(f"Loaded {len(traces_df)} traces from {EXPERIMENT_PATH}")
-if len(traces_df) > 0:
-    # Pick scalar columns that survive Arrow conversion. Complex columns
-    # (assessments, spans, metadata, tags) hold list-of-dict values that
-    # Spark's Arrow serializer cannot handle when display() converts the
-    # pandas DataFrame to a Spark DataFrame.
-    scalar_cols = [
-        c
-        for c in [
-            "trace_id",
-            "request_id",
-            "request_time",
-            "state",
-            "status",
-            "request_preview",
-            "response_preview",
-        ]
-        if c in traces_df.columns
-    ]
-    print(f"Trace columns: {list(traces_df.columns)}")
-    if scalar_cols:
-        display(traces_df[scalar_cols])  # noqa: F821
+
+# A short public PDF used as the source-of-truth artifact for the demo.
+# In production this would be a UC Volume path (/Volumes/<catalog>/<schema>/<vol>/<file>.pdf)
+# or a presigned URL from your artifact store. Either resolves to the same iframe `src`.
+SAMPLE_PDF_URL = (
+    "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf"
+)
+
+
+@mlflow.trace(span_type=SpanType.PARSER, name="parse_document")
+def parse_document(source_pdf_uri: str) -> dict:
+    """Stand-in for a real document-parsing agent.
+
+    The point is the trace shape. We attach the source PDF URI as trace metadata so the
+    downstream annotation app can locate the original document. The parsed markdown goes
+    in the response, which `mlflow.search_traces` exposes as a queryable field.
+    """
+    mlflow.update_current_trace(
+        metadata={
+            "source_pdf_uri": source_pdf_uri,
+            "mlflow.trace.user": "doc_parser_service",
+        }
+    )
+    # A real parser (OCR, ai_extract, etc.) would produce this. We hand-write it
+    # so the demo doesn't need an OCR endpoint configured.
+    parsed_markdown = (
+        "# Sample document (parsed)\n\n"
+        "## Section 1\n"
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. The parser captured the "
+        "intro paragraph cleanly.\n\n"
+        "## Section 2\n"
+        "Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. "
+        "Numbers and tables are where parsers tend to drift, so SMEs review those carefully.\n\n"
+        "## Section 3\n"
+        "Conclusion paragraph. The agent uses this markdown as input to a downstream LLM."
+    )
+    return {
+        "source_pdf_uri": source_pdf_uri,
+        "parsed_markdown": parsed_markdown,
+    }
+
+
+# Produce a few traces so the annotator has a queue to label.
+for _ in range(3):
+    parse_document(SAMPLE_PDF_URL)
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC ## Step 2. Pull the parsing traces and inspect the metadata
+# MAGIC
+# MAGIC `mlflow.search_traces` returns the parsing traces we just produced. Each one carries the
+# MAGIC source PDF URI in `request_metadata` and the parsed markdown in `response`. In a real
+# MAGIC annotator app this same call would filter for traces missing assessments from the current
+# MAGIC annotator.
+
+# COMMAND ----------
+
+from mlflow.client import MlflowClient
+
+exp = mlflow.get_experiment_by_name(EXPERIMENT_PATH)
+client = MlflowClient()
+
+# Pull the parse_document traces specifically. The annotator app reads these directly.
+parse_traces = client.search_traces(
+    experiment_ids=[exp.experiment_id],
+    filter_string="trace.name = 'parse_document'",
+    max_results=10,
+)
+print(f"Loaded {len(parse_traces)} parse_document traces.")
+if parse_traces:
+    sample = parse_traces[0]
+    print("\nSample trace:")
+    print(f"  trace_id:        {sample.info.trace_id}")
+    print(f"  request_metadata: {sample.info.request_metadata}")
+    if sample.data:
+        resp_preview = (
+            sample.data.response[:200]
+            if isinstance(sample.data.response, str)
+            else str(sample.data.response)[:200]
+        )
+        print(f"  response_preview: {resp_preview}")
 else:
     print(
-        "No traces found. Run notebook 01 first to populate the agent_traces experiment, "
-        "then re-run this notebook."
+        "No parse_document traces found. Run Step 1 first to produce them, then re-run this cell."
     )
 
 # COMMAND ----------
@@ -139,34 +198,52 @@ def render_annotation_view(
     displayHTML(html)  # noqa: F821
 
 
-# Demo render. In a real run the app reads pdf_url + markdown + downstream response
-# from the trace's span attributes. We use a public sample PDF here so the skeleton
-# renders without workspace-specific setup.
-SAMPLE_PDF_URL = (
-    "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf"
-)
-SAMPLE_MARKDOWN = """# Annual Report 2025
+# Read the PDF URI and parsed markdown directly from the first parse_document trace.
+# This is the exact mechanism the production annotation app would use: search for traces
+# that need annotation, pull the source artifact pointer and the parser output from each
+# trace, render them side by side.
+import json
 
-## Executive Summary
-- Revenue grew 24% year over year
-- Operating margin improved to 18.5%
-- Customer count crossed 50,000
 
-## Q4 Highlights
-The fourth quarter saw strong momentum across all product lines, with enterprise
-deals contributing the largest share of new ARR.
-"""
-SAMPLE_RESPONSE = (
-    "Revenue grew 24% YoY with operating margin reaching 18.5%. "
-    "Q4 was the strongest quarter, driven by enterprise."
-)
+def _extract_pdf_uri_and_markdown(trace):
+    """Pull the source PDF URI from trace metadata and the parsed markdown from the response."""
+    pdf_uri = (trace.info.request_metadata or {}).get("source_pdf_uri")
+    markdown = "(no parsed markdown found)"
+    if trace.data and trace.data.response:
+        try:
+            payload = (
+                json.loads(trace.data.response)
+                if isinstance(trace.data.response, str)
+                else trace.data.response
+            )
+            if isinstance(payload, dict):
+                markdown = payload.get("parsed_markdown", markdown)
+                # Fall back to the URI inside the response payload if metadata didn't carry it.
+                pdf_uri = pdf_uri or payload.get("source_pdf_uri")
+        except (ValueError, TypeError):
+            pass
+    return pdf_uri, markdown
 
-render_annotation_view(
-    trace_id="demo-trace-001",
-    pdf_url=SAMPLE_PDF_URL,
-    parsed_markdown=SAMPLE_MARKDOWN,
-    downstream_response=SAMPLE_RESPONSE,
-)
+
+if parse_traces:
+    target_trace = parse_traces[0]
+    pdf_uri, markdown = _extract_pdf_uri_and_markdown(target_trace)
+    if not pdf_uri:
+        print(
+            "Could not find source_pdf_uri on the trace metadata. Re-run Step 1 to produce "
+            "fresh traces with the expected metadata shape."
+        )
+    else:
+        print(f"Rendering annotation view for trace_id={target_trace.info.trace_id}")
+        render_annotation_view(
+            trace_id=target_trace.info.trace_id,
+            pdf_url=pdf_uri,
+            parsed_markdown=markdown,
+        )
+else:
+    print(
+        "No parse_document traces to render. Run Step 1 to produce them and try again."
+    )
 
 # COMMAND ----------
 
@@ -198,13 +275,12 @@ def submit_annotation(trace_id, annotator_email, assessment_name, value, rationa
 
 
 # Simulated annotator submission. In the production app this is form input on the UI.
-# Two assessments captured by the same annotator on the same trace:
+# Two assessments captured by the same annotator on the same parse_document trace:
 #  - markdown_matches_pdf: did the parser capture what was in the PDF?
-#  - downstream_response_correct: did the downstream LLM answer correctly?
-if len(traces_df) > 0:
-    # MLflow renamed request_id to trace_id; support both for forward and backward compat.
-    first_row = traces_df.iloc[0]
-    real_trace_id = first_row.get("trace_id") or first_row.get("request_id")
+#  - source_attribution_correct: are the section headings correctly tied to the source PDF?
+if parse_traces:
+    target_trace = parse_traces[0]
+    real_trace_id = target_trace.info.trace_id
     submit_annotation(
         trace_id=real_trace_id,
         annotator_email=CURRENT_USER,
@@ -215,14 +291,14 @@ if len(traces_df) > 0:
     submit_annotation(
         trace_id=real_trace_id,
         annotator_email=CURRENT_USER,
-        assessment_name="downstream_response_correct",
+        assessment_name="source_attribution_correct",
         value="partial",
-        rationale="Q1 financials correct, missed the Q4 customer-count callout.",
+        rationale="Section 2 numbers are correct. Section 3 conclusion drifts from the PDF.",
     )
 else:
     print(
-        "No traces in this experiment yet. Run notebook 01 first to populate traces, "
-        "then re-run this cell to attach annotations."
+        "No parse_document traces to annotate. Run Step 1 to produce them, "
+        "then re-run this cell."
     )
 
 # COMMAND ----------

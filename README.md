@@ -183,6 +183,42 @@ Notebook 03 walks through this exact pattern. `mlflow.genai.evaluate` doesn't ca
 
 ---
 
+## What the workspace looks like
+
+After running the full sequence, here is what each surface shows. All screenshots taken from the verification workspace.
+
+### Traces tab — what notebook 01 produces
+
+![Traces tab](./notebooks/images/screenshots/02_traces_list.png)
+
+25 traces in the experiment, each with session and user metadata flowing into trace fields. The Assessments column on the right surfaces the `answer_non_empty/mean` value the scorers wrote back.
+
+### Evaluations tab — what notebook 03 produces
+
+![Evaluations tab](./notebooks/images/screenshots/03_evaluations.png)
+
+One evaluation run per `mlflow.genai.evaluate` call. The columns show per-row scores from the code-based scorer and the LLM judge.
+
+### Labeling sessions — what notebook 02 produces
+
+![Labeling sessions](./notebooks/images/screenshots/04_labeling_sessions.png)
+
+A typed Review App session with 20 traces queued for SME annotation. Each trace's assessment progress is tracked per reviewer.
+
+### Serving endpoint — what notebook 06 produces
+
+![Serving endpoint](./notebooks/images/screenshots/05_serving_endpoint.png)
+
+The deployed agent at `genai-eval-demo-agent-<your-user-slug>`. Active configuration shows the served entity, the three env vars route AI Playground call traces back into the experiment.
+
+### Prompt Registry (manual step)
+
+The Prompt Registry surface in the experiment Prompts tab does not auto-discover prompts your notebooks register. To see the two prompt versions notebook 99 creates, click **Select a schema** in the top-right of the Prompts tab, pick the schema notebook 99 printed (default: `users.<your-user>`), and confirm. The Databricks UI displays this requirement on the schema-selector dialog itself.
+
+### Production monitoring
+
+Scheduled scorers registered by notebook 04 show up in the experiment's Monitoring view. The URL pattern moved recently in the Databricks UI, so the cleanest way to find them is via the experiment sidebar.
+
 ## Diagrams
 
 All diagrams are Excalidraw source plus rendered PNG, both committed under `notebooks/images/`. To edit, open the `.svg` in Excalidraw and re-render the PNG.
