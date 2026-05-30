@@ -41,12 +41,24 @@ from databricks.sdk import WorkspaceClient
 
 WorkspaceClient().workspace.mkdirs(EXPERIMENT_PARENT)
 
-# Override these with your own UC catalog / schema before deploying.
+# Per-user scoping so two engineers on the same team can run this workshop in the same
+# workspace without colliding on a shared model or endpoint. The slug is derived from the
+# part of the username before the @, lowercased, with non-alphanumerics replaced by underscores.
+# Override UC_CATALOG, UC_SCHEMA, MODEL_NAME, or ENDPOINT_NAME below to pin to a team-shared
+# resource if that fits your operating model better.
+import re
+
+_user_slug = re.sub(r"[^a-z0-9]+", "_", CURRENT_USER.split("@")[0].lower()).strip("_")
+
 UC_CATALOG = "main"
 UC_SCHEMA = "default"
-MODEL_NAME = f"{UC_CATALOG}.{UC_SCHEMA}.genai_eval_demo_agent"
-ENDPOINT_NAME = "genai-eval-demo-agent"
+MODEL_NAME = f"{UC_CATALOG}.{UC_SCHEMA}.genai_eval_demo_agent_{_user_slug}"
+ENDPOINT_NAME = f"genai-eval-demo-agent-{_user_slug.replace('_', '-')}"
 # ---------------------------------------------------------------------------
+
+print("Per-user-scoped resources:")
+print(f"  UC model: {MODEL_NAME}")
+print(f"  Serving endpoint: {ENDPOINT_NAME}")
 
 mlflow.set_experiment(EXPERIMENT_PATH)
 
@@ -144,7 +156,7 @@ mlflow.set_registry_uri("databricks-uc")
 # auto-inject the credentials the agent needs to call it from inside the serving
 # container. Without this, the WorkspaceClient() call in _agent_lib.py fails with
 # "default auth: cannot configure default credentials" when the model is queried.
-with mlflow.start_run(run_name="genai_eval_demo_agent_v1") as run:
+with mlflow.start_run(run_name=f"genai_eval_demo_agent_{_user_slug}") as run:
     logged = mlflow.pyfunc.log_model(
         name="agent",
         python_model=GenAIEvalDemoAgent(),

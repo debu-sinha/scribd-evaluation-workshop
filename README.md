@@ -106,15 +106,28 @@ Then open `/Workspace/Users/$USER/genai-evaluation-workshop/00_introduction` in 
 
 ## What each notebook produces
 
-After running the full sequence, your workspace contains:
+Every resource the notebooks create is per-user-scoped, so multiple engineers on the same team can run the workshop in the same workspace without colliding. After running the full sequence, your workspace contains:
 
 - One MLflow experiment at `/Workspace/Users/<you>/genai_evals_demo/agent_traces` with about 25 traces from notebook 01
 - A Review App labeling session with typed schemas for groundedness, relevance, rationale
 - One offline evaluation run with per-row scores from a code scorer and an LLM judge
 - One calibrated `relevance` judge registered as a scorer on the experiment
 - Two scheduled scorers (cheap structural check at 100 percent sampling, LLM judge at 10 percent sampling)
-- One Model Serving endpoint hosting the agent at `genai-eval-demo-agent` with three env vars routing AI Playground traces back into the same experiment
-- Two versioned prompts in the UC Prompt Registry under a schema you own
+- One Model Serving endpoint hosting the agent at `genai-eval-demo-agent-<your-user-slug>` with three env vars routing AI Playground traces back into the same experiment
+- One UC-registered model at `main.default.genai_eval_demo_agent_<your-user-slug>`
+- Two versioned prompts in the UC Prompt Registry under a schema you own (auto-detected from `system.information_schema.schemata`)
+
+## Per-user resource map
+
+| Resource | Scoping | Override in |
+|---|---|---|
+| MLflow experiment path | `/Workspace/Users/<you>/genai_evals_demo/agent_traces` | nb01-07: `EXPERIMENT_PATH` |
+| Review App labeling session name | `genai_evals_labeling_session_<timestamp>` | per-run unique, no override needed |
+| UC model name | `main.default.genai_eval_demo_agent_<user_slug>` | nb06: `MODEL_NAME` |
+| Serving endpoint name | `genai-eval-demo-agent-<user-slug>` | nb06: `ENDPOINT_NAME` |
+| Prompt registry name | `<your_owned_schema>.relevance_judge_instructions` | nb99: `PROMPT_SCHEMA` |
+
+If your team prefers a shared model or endpoint, override `MODEL_NAME` and `ENDPOINT_NAME` in nb06's config block to your team's chosen value. If you're an admin and want all team members landing under one prompt schema, override `PROMPT_SCHEMA` in nb99.
 
 ---
 
