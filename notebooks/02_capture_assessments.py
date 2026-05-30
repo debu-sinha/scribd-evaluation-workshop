@@ -217,7 +217,7 @@ print(f"Labeling session URL: {session.url}")
 # MAGIC %md
 # MAGIC ## What the SME sees
 # MAGIC
-# MAGIC ![Review App in use](./images/hd_review_app_in_use.png)
+
 # MAGIC
 # MAGIC Left side is the trace - question, retrieved docs, agent answer. Right side is the form
 # MAGIC built from the schemas above. The SME picks a category, writes a rationale, hits save. The
@@ -285,7 +285,7 @@ print(f"Labeling session URL: {session.url}")
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC ## What to verify on the call
+# MAGIC ## What to verify in your workspace
 # MAGIC
 # MAGIC 1. Open the experiment. Click the **Labeling Sessions** tab. Find the `genai_evals_labeling_session_*`
 # MAGIC    row that just got created.

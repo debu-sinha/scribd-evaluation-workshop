@@ -141,7 +141,7 @@ print(f"populated {ok}/{len(shuffled)} traces")
 # MAGIC %md
 # MAGIC ## What it looks like in the workspace
 # MAGIC
-# MAGIC ![Traces tab](./images/hd_02_traces_list.png)
+
 # MAGIC
 # MAGIC The Traces tab shows every `answer_question` call, with the chain / retrieve / generate span
 # MAGIC tree on the left and filter chips on top. Click a chip - `user: alice@example.com` - and the
@@ -150,7 +150,7 @@ print(f"populated {ok}/{len(shuffled)} traces")
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC ## What to verify on the call
+# MAGIC ## What to verify in your workspace
 # MAGIC
 # MAGIC 1. Open the **Experiments** left-nav, find `agent_traces`.
 # MAGIC 2. Click the **Traces** tab. You should see around 24 traces named `answer_question`.

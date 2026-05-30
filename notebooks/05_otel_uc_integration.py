@@ -310,7 +310,7 @@ if experiment:
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC ## What to verify on the call
+# MAGIC ## What to verify in your workspace
 # MAGIC
 # MAGIC 1. `client.search_traces(...)` returns the traces produced by notebook 01.
 # MAGIC 2. The SQL query above runs on demo-west because Traces-in-UC is enabled there. On a fresh
@@ -323,26 +323,27 @@ if experiment:
 # MAGIC %md
 # MAGIC # Closing - maturity statement
 # MAGIC
-# MAGIC ![Maturity](./images/hd_maturity_table.png)
+# MAGIC Every capability this workshop touches, called out by status. GA is shippable today. Public
+# MAGIC Preview is real today with documented caps. Beta has caveats worth knowing before you depend
+# MAGIC on it. Not shipped means there is no first-class surface yet, and the workaround is named.
 # MAGIC
-# MAGIC Every component in the stack you just saw, called out by status. Green is GA today. Orange is
-# MAGIC Public Preview - real today, with the documented caps. Red is either not shipped or not
-# MAGIC documented; the workaround is named in the notes.
+# MAGIC | Capability | Status | Notes |
+# MAGIC | --- | --- | --- |
+# MAGIC | MLflow GenAI core (tracing, evaluate) | **GA** | Managed MLflow 3, default in current runtimes |
+# MAGIC | `make_judge` custom LLM judges | **GA** | MLflow 3.4.0+ |
+# MAGIC | Custom `@scorer` decorator | **GA** | Function-based form works in both offline and production paths |
+# MAGIC | Third-party scorer adapters | **GA** | RAGAS, DeepEval, Arize, TruLens, documented adapters |
+# MAGIC | Review App labeling sessions | **GA** | Managed MLflow 3 |
+# MAGIC | OTel + Traces in Unity Catalog | **Public Preview** | 200 traces/sec workspace cap, 100 MB/sec table cap, admin enablement required |
+# MAGIC | `session.id` / `user.id` span attributes | **Public Preview** | Set as OTel span attributes, queryable as first-class trace fields once Traces-in-UC is on |
+# MAGIC | Scheduled scorers in production monitoring | **Beta** | 20-scorer cap, 15 to 20 minute warm-up, function-based `@scorer` only (class-based not supported) |
+# MAGIC | OTel `tasks` semantic conventions UI | **Not shipped** | Data persists and is SQL-queryable, but no first-class UI rendering yet, no public roadmap date |
+# MAGIC | Datadog as upstream forwarder | **Not documented** | Dual-export from your app's OTel SDK is the supported path |
+# MAGIC | `judge.align()` optimizers | **GA** | SIMBA is the no-arg default (per current docs and source). GEPA and MemAlign also selectable. MemAlign was flagged as the planned future default by the MLflow team in May 2026, but as of the workshop's verification snapshot SIMBA is still the documented default. |
 # MAGIC
-# MAGIC Anish, this is the answer to your "tell us directly what you cannot meet" ask:
-# MAGIC
-# MAGIC - **Traces-in-UC SQL surface** is Public Preview. Needs two workspace-admin previews enabled
-# MAGIC   ("OpenTelemetry on Databricks" + "Variant Shredding"). Documented caps: 200 traces/sec per
-# MAGIC   workspace, 100 MB/sec per table.
-# MAGIC - **Production scorer monitoring** is Beta per the docs. 20-scorer cap per experiment, 15 to
-# MAGIC   20 minute warm-up after `start()`, function-based `@scorer` only (class-based not supported).
-# MAGIC - **Datadog as a source connector** is not documented today. Path C above is the supported
-# MAGIC   pattern (dual-export from your app's OTel SDK to both endpoints).
-# MAGIC - **OTel `tasks` semantic UI** is not shipped. Span attributes persist and are SQL-queryable,
-# MAGIC   but there is no first-class UI rendering yet, and no public roadmap date.
-# MAGIC
-# MAGIC We are not paving over these. They go in the deployment plan with the workspace region and the
-# MAGIC SME list you bring back to us.
+# MAGIC The point of this table is to be honest about what is shippable today versus what needs a
+# MAGIC workspace admin enabling a Preview, versus what does not exist yet. Put the orange and red
+# MAGIC rows in your deployment plan with the workspace region and SME list when you scope the rollout.
 
 # COMMAND ----------
 

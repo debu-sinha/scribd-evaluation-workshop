@@ -242,7 +242,7 @@ print(
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC ## What to verify on the call
+# MAGIC ## What to verify in your workspace
 # MAGIC
 # MAGIC 1. **Serving** tab in the workspace nav. Find `genai-eval-demo-agent`. State = READY.
 # MAGIC 2. **AI Playground** in the left nav. Endpoint dropdown shows `genai-eval-demo-agent`.

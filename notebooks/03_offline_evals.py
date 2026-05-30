@@ -193,7 +193,7 @@ results = mlflow.genai.evaluate(
 # MAGIC %md
 # MAGIC ## What it looks like in the workspace
 # MAGIC
-# MAGIC ![Eval runs](./images/hd_03_eval_runs.png)
+
 # MAGIC
 # MAGIC The Evaluations tab shows one run per evaluation, with each scorer as a column. Click into
 # MAGIC a row to see the prompt the judge saw, the model's exact response, and the resulting score.
@@ -620,7 +620,7 @@ else:
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC ## What to verify on the call
+# MAGIC ## What to verify in your workspace
 # MAGIC
 # MAGIC 1. Open the experiment. Click the **Evaluations** tab. Find the run that just completed.
 # MAGIC 2. Per-row scores are visible for both `answer_contains_expected_keyword` and `relevance`.

@@ -12,6 +12,8 @@
 # MAGIC 2. Render the PDF and the parsed markdown side by side for the annotator.
 # MAGIC 3. Write the annotator's feedback back to the trace via `mlflow.log_feedback`.
 # MAGIC
+# MAGIC ![Custom annotation app concept](./images/hd_custom_annotation_app_concept.png)
+# MAGIC
 # MAGIC ## How storage and references work
 # MAGIC
 # MAGIC MLflow uses a split architecture. The relational backend store holds the run metadata,

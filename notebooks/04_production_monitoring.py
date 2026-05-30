@@ -171,7 +171,7 @@ _register_or_skip(relevance_judge, "relevance", 0.10)
 # MAGIC %md
 # MAGIC ## What it looks like in the workspace
 # MAGIC
-# MAGIC ![Job run](./images/hd_05_jobrun.png)
+
 # MAGIC
 # MAGIC The Monitoring tab on the experiment shows registered scorers, their sampling rate, and
 # MAGIC the rolling-window score over time. New traces flowing in get sampled and scored without
@@ -198,7 +198,7 @@ _register_or_skip(relevance_judge, "relevance", 0.10)
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC ## What to verify on the call
+# MAGIC ## What to verify in your workspace
 # MAGIC
 # MAGIC 1. Click the **Monitoring** tab on the experiment. Both `answer_non_empty` and `relevance`
 # MAGIC    should be listed as registered scorers.
