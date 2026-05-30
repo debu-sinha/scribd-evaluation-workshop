@@ -219,23 +219,6 @@ The Prompt Registry surface in the experiment Prompts tab does not auto-discover
 
 Scheduled scorers registered by notebook 04 show up in the experiment's Monitoring view. The URL pattern moved recently in the Databricks UI, so the cleanest way to find them is via the experiment sidebar.
 
-## Diagrams
-
-All diagrams are Excalidraw source plus rendered PNG, both committed under `notebooks/images/`. To edit, open the `.svg` in Excalidraw and re-render the PNG.
-
-| Diagram | Where it appears |
-|---|---|
-| `hd_problem.png` | Notebook 00, README |
-| `hd_three_pillars.png` | Notebook 00, README |
-| `hd_loop_diagram.png` | Notebook 03, README |
-| `hd_offline_evals_concept.png` | Notebook 03 |
-| `hd_production_monitoring_concept.png` | Notebook 04 |
-| `hd_otel_uc_integration_concept.png` | Notebook 05 |
-| `hd_scorer_pattern.png` | Notebook 03 |
-| `hd_custom_annotation_app_concept.png` | Notebook 07 |
-
----
-
 ## Verification
 
 Tested end to end on Databricks Serverless against the workspace listed in `docs/verification.md`. If a notebook fails for you, the usual causes are:
