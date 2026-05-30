@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1900" height="1000" viewBox="0 0 1900 1000">
+<defs><style>text { font-family: "Segoe UI", system-ui, -apple-system, sans-serif; }</style></defs>
+<rect x="0" y="0" width="1900" height="1000" fill="#0d1117"/>
+<text x="950" y="72" font-size="34" fill="#ffffff" text-anchor="middle" font-weight="600">Three pillars of evaluation at scale</text>
+<text x="950" y="116" font-size="17" fill="#9ca3af" text-anchor="middle">Your decision criteria. Everything in this workshop maps back to these.</text>
+
+<rect x="80" y="180" width="540" height="540" rx="8" stroke="#3b82f6" fill="#0a1929" stroke-width="2" />
+<ellipse cx="350" cy="250" rx="35" ry="35" stroke="#3b82f6" fill="#3b82f6" stroke-width="2" />
+<text x="350" y="262" font-size="32" fill="#ffffff" text-anchor="middle">1</text>
+<text x="350" y="380" font-size="36" fill="#60a5fa" text-anchor="middle" font-weight="600">Scale</text>
+<text x="350" y="450" font-size="18" fill="#e5e7eb" text-anchor="middle">Trace volume x multi-judge</text>
+<text x="350" y="478" font-size="18" fill="#e5e7eb" text-anchor="middle">fan-out is where other tools</text>
+<text x="350" y="506" font-size="18" fill="#e5e7eb" text-anchor="middle">hit ceilings. This stack</text>
+<text x="350" y="534" font-size="18" fill="#e5e7eb" text-anchor="middle">keeps pace at that scale.</text>
+
+<rect x="680" y="180" width="540" height="540" rx="8" stroke="#a78bfa" fill="#1a0a29" stroke-width="2" />
+<ellipse cx="950" cy="250" rx="35" ry="35" stroke="#a78bfa" fill="#a78bfa" stroke-width="2" />
+<text x="950" y="262" font-size="32" fill="#ffffff" text-anchor="middle">2</text>
+<text x="950" y="380" font-size="30" fill="#c4b5fd" text-anchor="middle" font-weight="600">Existing observability</text>
+<text x="950" y="418" font-size="30" fill="#c4b5fd" text-anchor="middle" font-weight="600">integration</text>
+<text x="950" y="478" font-size="18" fill="#e5e7eb" text-anchor="middle">OTel-native dual-export.</text>
+<text x="950" y="506" font-size="18" fill="#e5e7eb" text-anchor="middle">Your existing stack (Datadog,</text>
+<text x="950" y="534" font-size="18" fill="#e5e7eb" text-anchor="middle">Honeycomb, etc.) coexists.</text>
+<text x="950" y="562" font-size="18" fill="#e5e7eb" text-anchor="middle">One span stream, two stacks.</text>
+
+<rect x="1280" y="180" width="540" height="540" rx="8" stroke="#34d399" fill="#0a291a" stroke-width="2" />
+<ellipse cx="1550" cy="250" rx="35" ry="35" stroke="#34d399" fill="#34d399" stroke-width="2" />
+<text x="1550" y="262" font-size="32" fill="#ffffff" text-anchor="middle">3</text>
+<text x="1550" y="380" font-size="30" fill="#6ee7b7" text-anchor="middle" font-weight="600">Customizable</text>
+<text x="1550" y="418" font-size="30" fill="#6ee7b7" text-anchor="middle" font-weight="600">metrics</text>
+<text x="1550" y="478" font-size="18" fill="#e5e7eb" text-anchor="middle">Prompt-based judges.</text>
+<text x="1550" y="506" font-size="18" fill="#e5e7eb" text-anchor="middle">Statistical and code scorers.</text>
+<text x="1550" y="534" font-size="18" fill="#e5e7eb" text-anchor="middle">Third-party scorer adapters.</text>
+<text x="1550" y="562" font-size="18" fill="#e5e7eb" text-anchor="middle">Mix and match in one eval.</text>
+
+<rect x="80" y="800" width="1740" height="160" rx="8" stroke="#f59e0b" fill="#1a1408" stroke-width="2" />
+<text x="950" y="848" font-size="22" fill="#fbbf24" text-anchor="middle" font-weight="600">Plus the fourth pillar: name what this stack cannot meet today.</text>
+<text x="950" y="894" font-size="16" fill="#d1d5db" text-anchor="middle">Every component in this stack is called out as GA, Public Preview, Beta, or not shipped.</text>
+<text x="950" y="924" font-size="16" fill="#d1d5db" text-anchor="middle">The maturity table at the end of this workshop is the full list, by name, by status, with operational caveats.</text>
+</svg>

@@ -1,0 +1,14 @@
+{
+  "run_name": "genai_evals_e2e",
+  "tasks": [
+    {"task_key":"nb01","notebook_task":{"notebook_path":"/Workspace/Users/<your-user>/genai-evaluation-workshop/notebooks/01_agent_app"},"environment_key":"env"},
+    {"task_key":"nb02","depends_on":[{"task_key":"nb01"}],"notebook_task":{"notebook_path":"/Workspace/Users/<your-user>/genai-evaluation-workshop/notebooks/02_capture_assessments"},"environment_key":"env"},
+    {"task_key":"nb03","depends_on":[{"task_key":"nb02"}],"notebook_task":{"notebook_path":"/Workspace/Users/<your-user>/genai-evaluation-workshop/notebooks/03_offline_evals"},"environment_key":"env"},
+    {"task_key":"nb04","depends_on":[{"task_key":"nb03"}],"notebook_task":{"notebook_path":"/Workspace/Users/<your-user>/genai-evaluation-workshop/notebooks/04_production_monitoring"},"environment_key":"env"},
+    {"task_key":"nb05","depends_on":[{"task_key":"nb04"}],"notebook_task":{"notebook_path":"/Workspace/Users/<your-user>/genai-evaluation-workshop/notebooks/05_otel_uc_integration"},"environment_key":"env"},
+    {"task_key":"nb06","depends_on":[{"task_key":"nb05"}],"notebook_task":{"notebook_path":"/Workspace/Users/<your-user>/genai-evaluation-workshop/notebooks/06_deploy_agent"},"environment_key":"env"},
+    {"task_key":"nb07","depends_on":[{"task_key":"nb06"}],"notebook_task":{"notebook_path":"/Workspace/Users/<your-user>/genai-evaluation-workshop/notebooks/07_custom_annotation_app"},"environment_key":"env"},
+    {"task_key":"nb99","depends_on":[{"task_key":"nb07"}],"notebook_task":{"notebook_path":"/Workspace/Users/<your-user>/genai-evaluation-workshop/notebooks/99_register_judge_prompt_versions"},"environment_key":"env"}
+  ],
+  "environments": [{"environment_key":"env","spec":{"client":"4","dependencies":["mlflow[databricks]>=3.0.0","databricks-sdk","databricks-agents","dspy"]}}]
+}
