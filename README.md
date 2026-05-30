@@ -84,7 +84,7 @@ Three paths. Pick whichever fits how your team usually pulls code into the works
 
 **Path 1: Databricks Repos (recommended, no CLI, no download)**
 
-In the workspace sidebar, click **Workspace** → **Repos** → **Add Repo**. Paste:
+In the workspace sidebar, click **Workspace** > **Repos** > **Add Repo**. Paste:
 
 ```
 https://github.com/debu-sinha/scribd-evaluation-workshop
@@ -96,10 +96,10 @@ This is the path the verification job runs against. If your workspace has git pr
 
 **Path 2: ZIP import via GUI**
 
-Use this if your workspace doesn't have GitHub configured under Settings → Linked accounts.
+Use this if your workspace doesn't have GitHub configured under Settings > Linked accounts.
 
-1. On GitHub, click **Code** → **Download ZIP**.
-2. In your Databricks workspace, right-click your user folder → **Import** → **File** → upload the ZIP.
+1. On GitHub, click **Code** > **Download ZIP**.
+2. In your Databricks workspace, right-click your user folder > **Import** > **File** > upload the ZIP.
 3. Open `notebooks/00_introduction` from the imported folder and run them in order.
 
 **Path 3: CLI import-dir**
@@ -187,25 +187,25 @@ Notebook 03 walks through this exact pattern. `mlflow.genai.evaluate` doesn't ca
 
 After running the full sequence, here is what each surface shows. All screenshots taken from the verification workspace.
 
-### Traces tab — what notebook 01 produces
+### Traces tab - what notebook 01 produces
 
 ![Traces tab](./notebooks/images/screenshots/02_traces_list.png)
 
 25 traces in the experiment, each with session and user metadata flowing into trace fields. The Assessments column on the right surfaces the `answer_non_empty/mean` value the scorers wrote back.
 
-### Evaluations tab — what notebook 03 produces
+### Evaluations tab - what notebook 03 produces
 
 ![Evaluations tab](./notebooks/images/screenshots/03_evaluations.png)
 
 One evaluation run per `mlflow.genai.evaluate` call. The columns show per-row scores from the code-based scorer and the LLM judge.
 
-### Labeling sessions — what notebook 02 produces
+### Labeling sessions - what notebook 02 produces
 
 ![Labeling sessions](./notebooks/images/screenshots/04_labeling_sessions.png)
 
 A typed Review App session with 20 traces queued for SME annotation. Each trace's assessment progress is tracked per reviewer.
 
-### Serving endpoint — what notebook 06 produces
+### Serving endpoint - what notebook 06 produces
 
 ![Serving endpoint](./notebooks/images/screenshots/05_serving_endpoint.png)
 
